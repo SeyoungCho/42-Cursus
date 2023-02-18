@@ -6,23 +6,30 @@
 /*   By: seycho <seycho@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 17:25:45 by seycho            #+#    #+#             */
-/*   Updated: 2023/02/17 21:42:29 by seycho           ###   ########.fr       */
+/*   Updated: 2023/02/18 17:01:23 by seycho           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "get_next_line_bonus.h"
 
-static void	free_and_null(char **ptr)
-{
-	free(*ptr);
-	*ptr = NULL;
-}
-
-static void	*free_and_return(char **ptr)
+static void	*free_and_null(char **ptr)
 {
 	if (*ptr)
-		free_and_null(ptr);
+	{
+		free(*ptr);
+		*ptr = NULL;
+	}
 	return (NULL);
+}
+
+static ssize_t	ft_read_from_file(char **buf, int fd)
+{
+	ssize_t	read_bytes;
+
+	read_bytes = read(fd, *buf, BUFFER_SIZE);
+	if (read_bytes >= 0)
+		(*buf)[read_bytes] = '\0';
+	return (read_bytes);
 }
 
 static char	*ft_extract_line(char **storage, char *endl, char **buf)
@@ -39,7 +46,7 @@ static char	*ft_extract_line(char **storage, char *endl, char **buf)
 			return (NULL);
 		free_and_null(storage);
 		if (ft_strlen(ret) == 0)
-			return (free_and_return(&ret));
+			return (free_and_null(&ret));
 		return (ret);
 	}
 	line_size = endl - *storage + 1;
@@ -54,22 +61,15 @@ static char	*ft_extract_line(char **storage, char *endl, char **buf)
 	return (ret);
 }
 
-static char	*ft_join_buffer(char *storage, char *buf, size_t size)
+static char	*ft_join_buffer(char *storage, char *buf)
 {
-	char	*tmp;
 	char	*prev_storage;
 
-	tmp = (char *)malloc(sizeof(char) * size + 1);
-	if (!tmp)
-		return (NULL);
-	tmp[size] = '\0';
-	tmp = ft_memcpy(tmp, buf, size);
 	prev_storage = storage;
-	storage = ft_strjoin(storage, tmp);
+	storage = ft_strjoin(storage, buf);
 	free_and_null(&prev_storage);
 	if (!storage)
 		return (NULL);
-	free_and_null(&tmp);
 	return (storage);
 }
 
@@ -80,22 +80,24 @@ char	*get_next_line(int fd)
 	ssize_t		read_bytes;
 
 	buf = (char *)malloc(sizeof(char) * (BUFFER_SIZE + 1));
-	if (!buf && fd < 0)
+	if (!buf)
 		return (NULL);
-	read_bytes = read(fd, buf, BUFFER_SIZE);
+	if (fd < 0)
+		return (free_and_null(&buf));
+	read_bytes = ft_read_from_file(&buf, fd);
 	while (read_bytes > 0)
 	{
-		storage[fd] = ft_join_buffer(storage[fd], buf, (size_t)read_bytes);
-		if (ft_strchr(storage[fd], '\n'))
+		storage[fd] = ft_join_buffer(storage[fd], buf);
+		if (ft_strchr(buf, '\n'))
 			return (ft_extract_line(&storage[fd], \
 			ft_strchr(storage[fd], '\n'), &buf));
-		read_bytes = read(fd, buf, BUFFER_SIZE);
+		read_bytes = ft_read_from_file(&buf, fd);
 	}
 	if (!storage[fd] || read_bytes < 0)
 	{
 		if (storage[fd])
 			free_and_null(&storage[fd]);
-		return (free_and_return(&buf));
+		return (free_and_null(&buf));
 	}
 	return (ft_extract_line(&storage[fd], ft_strchr(storage[fd], '\n'), &buf));
 }

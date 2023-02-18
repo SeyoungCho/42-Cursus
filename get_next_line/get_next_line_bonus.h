@@ -6,7 +6,7 @@
 /*   By: seycho <seycho@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/02/17 17:28:08 by seycho            #+#    #+#             */
-/*   Updated: 2023/02/17 21:33:46 by seycho           ###   ########.fr       */
+/*   Updated: 2023/02/18 17:01:20 by seycho           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,7 +26,7 @@
 
 char	*get_next_line(int fd);
 
-/* get_next_line_util.c. */
+/* get_next_line_utils_bonus.c. */
 size_t	ft_strlen(const char *s);
 void	*ft_memcpy(void *dst, const void *src, size_t n);
 char	*ft_strjoin(char const *s1, char const *s2);
