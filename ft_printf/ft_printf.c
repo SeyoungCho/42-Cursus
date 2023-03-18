@@ -6,7 +6,7 @@
 /*   By: seycho <seycho@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2023/03/11 20:34:18 by seycho            #+#    #+#             */
-/*   Updated: 2023/03/11 22:17:15 by seycho           ###   ########.fr       */
+/*   Updated: 2023/03/17 20:53:31 by seycho           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -34,6 +34,8 @@ static int	print_conversion(const char **format, va_list args)
 	}
 	else if (**format == '%')
 		printed_len += ft_putchar('%');
+	else
+		printed_len = -1;
 	(*format)++;
 	return (printed_len);
 }
